@@ -1057,7 +1057,7 @@ function loadDemo(){
 
 // ---------- cloud: Clerk sign-in + Supabase storage ----------
 const CFG = window.SAATHI_CONFIG || {};
-const cloud = { ready:false, enabled: !!(CFG.clerkPublishableKey && CFG.supabaseUrl && CFG.supabaseKey), user:null, db:null, status:'', lastSync:null, deleted:new Set(), timer:null };
+const cloud = { pulled:false, ready:false, enabled: !!(CFG.clerkPublishableKey && CFG.supabaseUrl && CFG.supabaseKey), user:null, db:null, status:'', lastSync:null, deleted:new Set(), timer:null };
 function loadScript(src, attrs = {}){
   return new Promise((res, rej) => { const s = document.createElement('script'); s.src = src; s.async = true; s.crossOrigin = 'anonymous';
     Object.entries(attrs).forEach(([k,v]) => s.setAttribute(k, v)); s.onload = res; s.onerror = () => rej(new Error('Could not load ' + src)); document.head.appendChild(s); });
@@ -1074,12 +1074,14 @@ async function cloudInit(){
       accessToken: async () => (await window.Clerk.session?.getToken()) ?? null
     });
     cloud.ready = true;
-    window.Clerk.addListener(({ user }) => {
+    const onUser = (user) => {
       const was = cloud.user?.id; cloud.user = user || null;
-      if (cloud.user && cloud.user.id !== was) cloudPull();
-      if (!cloud.user) cloud.status = '';
+      if (cloud.user && cloud.user.id !== was){ cloud.pulled = false; cloudPull(); }
+      if (!cloud.user){ cloud.status = ''; cloud.pulled = false; }
       render();
-    });
+    };
+    onUser(window.Clerk.user);
+    window.Clerk.addListener(({ user }) => { if ((user?.id || null) !== (cloud.user?.id || null)) onUser(user); });
   } catch(e){ cloud.status = 'Cloud is unavailable right now (' + e.message.slice(0,60) + ')'; render(); }
 }
 function cloudSignIn(){ if (!cloud.ready){ toast(cloud.enabled ? 'Cloud is still loading. Try again in a moment.' : 'Cloud is not set up yet.'); return; } window.Clerk.openSignIn({}); }
@@ -1088,7 +1090,7 @@ const entryRow = (e, dayKey) => ({ id: e.id, user_id: cloud.user.id, day: dayKey
   calories: e.calories != null ? Math.round(e.calories) : null, glasses: e.glasses ?? null, minutes: e.minutes != null ? Math.round(e.minutes) : null, hours: e.hours ?? null });
 function appState(){ return { days: S.days, chat: S.chat, settings: { ...S.settings, apiKey:'' } }; }
 async function cloudPush(){
-  if (!cloud.ready || !cloud.user) return;
+  if (!cloud.ready || !cloud.user || !cloud.pulled) return;
   cloud.status = 'Saving…'; refreshCloudLine();
   try {
     const { error: e1 } = await cloud.db.from('health_profiles').upsert({ user_id: cloud.user.id, name: S.profile.name || null, profile: S.profile, app_state: appState(), updated_at: new Date().toISOString() });
@@ -1114,12 +1116,20 @@ async function cloudPull(){
         local.entries.sort((a,b) => a.t - b.t);
         local.meds = { ...(d.meds || {}), ...(local.meds || {}) };
       }
-      if (!S.profile.name && data.profile) S.profile = Object.assign({}, DEFAULT.profile, data.profile);
+      if (!S.profile.name && data.profile && data.profile.name) S.profile = Object.assign({}, DEFAULT.profile, data.profile);
       if (!S.chat.length && remote.chat) S.chat = remote.chat;
-      try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){}
-      toast('Your saved data is back');
     }
-    cloud.status = ''; await cloudPush();
+    const { data: rows, error: e2 } = await cloud.db.from('health_entries').select('*').order('logged_at');
+    if (e2) throw e2;
+    let added = 0;
+    for (const r of rows || []){
+      const d = day(r.day); if (d.entries.some(e => e.id === r.id)) continue;
+      d.entries.push({ id: r.id, t: new Date(r.logged_at).getTime(), type: r.type, text: r.description || '', calories: r.calories, glasses: r.glasses != null ? Number(r.glasses) : null, minutes: r.minutes, hours: r.hours != null ? Number(r.hours) : null });
+      d.entries.sort((a,b) => a.t - b.t); added++;
+    }
+    try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){}
+    if (data || added) toast('Your saved data is loaded');
+    cloud.pulled = true; cloud.status = ''; await cloudPush();
   } catch(e){ cloud.status = 'Could not load saved data: ' + (e.message || e).toString().slice(0,80); }
   render();
 }
