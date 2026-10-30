@@ -1,0 +1,17 @@
+{
+  "name": "Arogya Saathi",
+  "short_name": "Saathi",
+  "description": "Your AI health companion — speak to log food, water and walks.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f5f6f3",
+  "theme_color": "#1d5c4f",
+  "categories": ["health", "lifestyle", "medical"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
