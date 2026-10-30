@@ -11,6 +11,10 @@ An AI health companion for adults over 60. Instead of filling in forms, the pers
 - **Family and safety**: one-tap SOS to the caretaker or 112, and a WhatsApp daily update
 - **Medicine checklist**, large-text mode, light and dark themes
 - Installs on a phone like an app and works offline for basic logging
+- **Save online**: sign in with **Clerk** (email or Google) and the health log is stored in **Supabase**, protected so each person can only see their own data
+
+## Tech
+Static web app (HTML/CSS/JS, no build step) hosted on **Vercel** · **Google Gemini** for AI · **Clerk** for sign-in · **Supabase** (Postgres with row-level security) for storage. Cloud keys live in `config.js` (publishable keys only).
 
 ## Run it
 Open the GitHub Pages link in Chrome, then go to **Profile → AI connection** and paste a free Gemini API key from [Google AI Studio](https://aistudio.google.com/apikey). To install it, use Chrome's menu → **Install app**.

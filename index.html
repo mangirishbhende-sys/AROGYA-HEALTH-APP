@@ -314,6 +314,7 @@ nav.tabs .fab svg{width:26px;height:26px}
 <div id="layer"></div>
 <input type="file" id="photoInput" accept="image/*" capture="environment" class="hidden">
 
+<script src="config.js"></script>
 <script>
 /* =========================================================
    Arogya Saathi — AI health companion for adults over 60
@@ -363,7 +364,7 @@ const ic = (n, cls = 'i') => `<svg class="${cls}" viewBox="0 0 24 24" aria-hidde
 const KEY = 'arogya_saathi_v1';
 let memoryFallback = null;
 function load(){ try { const raw = localStorage.getItem(KEY); if (raw) return JSON.parse(raw); } catch(e){} return memoryFallback; }
-function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){ memoryFallback = S; } }
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){ memoryFallback = S; } if (typeof cloudSoon === 'function') cloudSoon(); }
 const DEFAULT = {
   profile:{ name:'', age:'', sex:'', height:'', weight:'', diet:'veg', conditions:'', meds:'', goal:'Stay active and eat well',
             waterTarget:8, walkTarget:30, caretakerName:'', caretakerPhone:'', doctorPhone:'' },
@@ -530,7 +531,7 @@ Rules: You know Indian and Goan home food well (poi, pav, bhaji, xitt-kodi fish 
   if (S.settings.speak) speak((result.alert ? result.alert + ' ' : '') + S.lastReply.text);
 }
 function addEntry(e){ if (e.text) e.text = e.text[0].toUpperCase() + e.text.slice(1); day().entries.push({ id: uid(), t: Date.now(), ...e }); save(); }
-function removeEntry(id){ const d = day(); d.entries = d.entries.filter(e => e.id !== id); save(); render(); }
+function removeEntry(id){ cloud.deleted.add(id); const d = day(); d.entries = d.entries.filter(e => e.id !== id); save(); render(); }
 
 // ---------- food photo ----------
 let pendingPhoto = null;
@@ -697,7 +698,7 @@ function renderBar(){
   $('#appbar').innerHTML = `<div class="logo">${ic('logo')}</div>
     <div class="brandname grow">Arogya Saathi</div>
     <a class="sos" href="${sos}" aria-label="Emergency help: call ${esc(p.caretakerName || '112')}">${ic('phone')} SOS</a>
-    <button class="avatar" data-tab="profile" aria-label="Profile and settings">${initials() || ic('user')}</button>`;
+    <button class="avatar" data-tab="profile" aria-label="Profile and settings" ${cloud.user?.imageUrl ? `style="background:url('${esc(cloud.user.imageUrl)}') center/cover"` : ''}>${cloud.user?.imageUrl ? '' : (initials() || ic('user'))}</button>`;
 }
 
 function dayPct(t, p){
@@ -918,6 +919,7 @@ function vProfile(){
     <label class="f" for="pMeds">Daily medicines (one per line)</label><textarea id="pMeds" placeholder="e.g. BP tablet – morning">${esc(p.meds)}</textarea>
   </section>
 
+  ${vCloudCard()}
   <div class="profilegrid"><div>
   <section class="card">
     <div class="card-h">${chipI('activity')}<h2 class="grow">Daily goals</h2></div>
@@ -946,7 +948,7 @@ function vProfile(){
     ${f('sKey','Gemini API key',st.apiKey,'password','autocomplete="off" placeholder="AIza…"')}
     <details style="margin-top:10px"><summary class="small muted" style="cursor:pointer">Advanced</summary>${f('sModel','Model (leave empty for automatic)',st.model,'text','placeholder="automatic"')}</details>
     <button style="width:100%;margin-top:12px" data-act="testAI" data-busy>${ic('spark')} Test connection</button>
-    <div class="note">${ic('shield')}<span>Your log stays on this phone. Only what you send to Saathi goes to Google Gemini to be understood. On the free tier Google may use it to improve its models, so avoid very personal details like Aadhaar numbers.</span></div>
+    <div class="note">${ic('shield')}<span>Your log stays on this phone, and online only if you sign in to save it. Only what you send to Saathi goes to Google Gemini to be understood. On the free tier Google may use it to improve its models, so avoid very personal details like Aadhaar numbers.</span></div>
   </section>
 
   </div></div>
@@ -980,7 +982,7 @@ const ACT = {
   tell: () => tellSaathi($('#tellText').value),
   photo: () => $('#photoInput').click(),
   waterPlus: () => { addEntry({ type:'water', text:'Glass of water', glasses:1 }); render(); },
-  waterMinus: () => { const d = day(); for (let i = d.entries.length - 1; i >= 0; i--) if (d.entries[i].type === 'water'){ d.entries.splice(i,1); break; } save(); render(); },
+  waterMinus: () => { const d = day(); for (let i = d.entries.length - 1; i >= 0; i--) if (d.entries[i].type === 'water'){ cloud.deleted.add(d.entries[i].id); d.entries.splice(i,1); break; } save(); render(); },
   walk10: () => { addEntry({ type:'activity', text:'Walk', minutes:10 }); render(); toast('Lovely! 10 minutes added'); },
   speakCheckin: () => speak(S.checkin?.text),
   speakReply: () => speak(S.lastReply?.text),
@@ -991,6 +993,9 @@ const ACT = {
   ask: () => askCoach($('#askText').value),
   clearChat: async () => { if (await confirmSheet('Clear conversation?', 'Your chat with the coach will be removed.', 'Clear')){ S.chat = []; save(); render(); } },
   weekReport: makeWeekReport,
+  cloudIn: cloudSignIn,
+  cloudOut: cloudSignOut,
+  cloudSync: () => cloudPush().then(() => toast(cloud.status || 'Saved online')),
   copyReport: () => { navigator.clipboard?.writeText(weekReport?.text || '').then(() => toast('Copied')); },
   micProfile: () => listen(fillProfileFromSpeech, 'Tell me your name, age, food habits, health conditions and medicines'),
   testAI: async () => {
@@ -1049,10 +1054,100 @@ function loadDemo(){
   S.checkin = null; save();
 }
 
+
+// ---------- cloud: Clerk sign-in + Supabase storage ----------
+const CFG = window.SAATHI_CONFIG || {};
+const cloud = { ready:false, enabled: !!(CFG.clerkPublishableKey && CFG.supabaseUrl && CFG.supabaseKey), user:null, db:null, status:'', lastSync:null, deleted:new Set(), timer:null };
+function loadScript(src, attrs = {}){
+  return new Promise((res, rej) => { const s = document.createElement('script'); s.src = src; s.async = true; s.crossOrigin = 'anonymous';
+    Object.entries(attrs).forEach(([k,v]) => s.setAttribute(k, v)); s.onload = res; s.onerror = () => rej(new Error('Could not load ' + src)); document.head.appendChild(s); });
+}
+async function cloudInit(){
+  if (!cloud.enabled) return;
+  try {
+    const pk = CFG.clerkPublishableKey.trim();
+    const fapi = atob(pk.split('_')[2]).replace(/\$$/, '');
+    await loadScript(`https://${fapi}/npm/@clerk/clerk-js@5/dist/clerk.browser.js`, { 'data-clerk-publishable-key': pk });
+    await window.Clerk.load({ appearance:{ variables:{ colorPrimary:'#1d5c4f', fontSize:'16px', borderRadius:'12px' } } });
+    await loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js');
+    cloud.db = window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseKey, {
+      accessToken: async () => (await window.Clerk.session?.getToken()) ?? null
+    });
+    cloud.ready = true;
+    window.Clerk.addListener(({ user }) => {
+      const was = cloud.user?.id; cloud.user = user || null;
+      if (cloud.user && cloud.user.id !== was) cloudPull();
+      if (!cloud.user) cloud.status = '';
+      render();
+    });
+  } catch(e){ cloud.status = 'Cloud is unavailable right now (' + e.message.slice(0,60) + ')'; render(); }
+}
+function cloudSignIn(){ if (!cloud.ready){ toast(cloud.enabled ? 'Cloud is still loading. Try again in a moment.' : 'Cloud is not set up yet.'); return; } window.Clerk.openSignIn({}); }
+async function cloudSignOut(){ if (!await confirmSheet('Sign out?', 'Your data stays saved online and on this phone.', 'Sign out')) return; await window.Clerk.signOut(); toast('Signed out'); }
+const entryRow = (e, dayKey) => ({ id: e.id, user_id: cloud.user.id, day: dayKey, logged_at: new Date(e.t).toISOString(), type: e.type, description: e.text,
+  calories: e.calories != null ? Math.round(e.calories) : null, glasses: e.glasses ?? null, minutes: e.minutes != null ? Math.round(e.minutes) : null, hours: e.hours ?? null });
+function appState(){ return { days: S.days, chat: S.chat, settings: { ...S.settings, apiKey:'' } }; }
+async function cloudPush(){
+  if (!cloud.ready || !cloud.user) return;
+  cloud.status = 'Saving…'; refreshCloudLine();
+  try {
+    const { error: e1 } = await cloud.db.from('health_profiles').upsert({ user_id: cloud.user.id, name: S.profile.name || null, profile: S.profile, app_state: appState(), updated_at: new Date().toISOString() });
+    if (e1) throw e1;
+    const rows = []; const since = new Date(); since.setDate(since.getDate() - 30);
+    for (const [k, d] of Object.entries(S.days)) if (new Date(k) >= since) for (const e of d.entries) rows.push(entryRow(e, k));
+    if (rows.length){ const { error: e2 } = await cloud.db.from('health_entries').upsert(rows); if (e2) throw e2; }
+    if (cloud.deleted.size){ const ids = [...cloud.deleted]; const { error: e3 } = await cloud.db.from('health_entries').delete().in('id', ids); if (!e3) ids.forEach(i => cloud.deleted.delete(i)); }
+    cloud.lastSync = new Date(); cloud.status = '';
+  } catch(e){ cloud.status = 'Not saved online: ' + (e.message || e).toString().slice(0,80); }
+  refreshCloudLine();
+}
+async function cloudPull(){
+  cloud.status = 'Loading your saved data…'; render();
+  try {
+    const { data, error } = await cloud.db.from('health_profiles').select('*').maybeSingle();
+    if (error) throw error;
+    if (data){
+      const remote = data.app_state || {};
+      for (const [k, d] of Object.entries(remote.days || {})){
+        const local = day(k); const ids = new Set(local.entries.map(e => e.id));
+        for (const e of d.entries || []) if (!ids.has(e.id)) local.entries.push(e);
+        local.entries.sort((a,b) => a.t - b.t);
+        local.meds = { ...(d.meds || {}), ...(local.meds || {}) };
+      }
+      if (!S.profile.name && data.profile) S.profile = Object.assign({}, DEFAULT.profile, data.profile);
+      if (!S.chat.length && remote.chat) S.chat = remote.chat;
+      try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){}
+      toast('Your saved data is back');
+    }
+    cloud.status = ''; await cloudPush();
+  } catch(e){ cloud.status = 'Could not load saved data: ' + (e.message || e).toString().slice(0,80); }
+  render();
+}
+function cloudSoon(){ if (!cloud.user) return; clearTimeout(cloud.timer); cloud.timer = setTimeout(cloudPush, 1500); }
+function cloudLine(){
+  if (!cloud.enabled) return 'Not set up yet';
+  if (!cloud.ready) return cloud.status || 'Connecting…';
+  if (!cloud.user) return 'Signed out. Your data is only on this phone.';
+  if (cloud.status) return cloud.status;
+  return cloud.lastSync ? 'Saved online at ' + cloud.lastSync.toLocaleTimeString('en-IN',{hour:'numeric',minute:'2-digit'}) : 'Signed in';
+}
+function refreshCloudLine(){ const el = $('#cloudLine'); if (el) el.textContent = cloudLine(); }
+function vCloudCard(){
+  const u = cloud.user; const email = u?.primaryEmailAddress?.emailAddress || '';
+  return `<section class="card">
+    <div class="card-h"><span class="chipicon" style="background:var(--water-soft);color:var(--water)">${ic('shield')}</span><div class="grow"><h2>Save online</h2><p class="xs muted" id="cloudLine">${esc(cloudLine())}</p></div>${u ? '<span class="badge">On</span>' : ''}</div>
+    ${u ? `<p class="small">Signed in as <b>${esc(email || u.fullName || 'you')}</b>. Everything you log is saved securely, so it is safe if this phone is lost and you can sign in on another phone.</p>
+        <div class="two" style="margin-top:12px"><button data-act="cloudSync">Save now</button><button data-act="cloudOut">Sign out</button></div>`
+      : `<p class="small muted">Sign in with your email or Google account to keep a safe online copy of your health log.</p>
+        <button class="primary" style="width:100%;margin-top:12px" data-act="cloudIn" ${cloud.enabled ? '' : 'disabled'}>Sign in to save online</button>`}
+  </section>`;
+}
+
 // ---------- start ----------
 render();
 if (view === 'home') runCheckin();
 window.addEventListener('online', () => toast('Back online'));
+cloudInit();
 window.matchMedia('(min-width: 960px)').addEventListener('change', () => render());
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});
 </script>
