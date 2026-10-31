@@ -238,14 +238,27 @@ The commit history shows how it grew: a single-page prototype, then the design, 
 
 **Who tested it, what they did, what confused them, and what I changed**
 
-I had not yet put the app in front of someone from the target group at the time of submission. I tested it myself on phone and laptop sizes, and those checks led to changes:
+**User test 1: Mr. Prakash K., about 58–60 (the same person as Interview 1 in Q1), in person, 31 Oct 2026.** He opened the live app while I watched.
+
+*What he did:*
+
+- **Setup step 1 (about you):** he used **"Fill this in by speaking"** and answered aloud instead of typing: name, age, email, weight and the other basics. He liked that he only had to answer, and said it stops typing from feeling boring.
+- **Setup step 2 (health and medicines):** he typed "BP" as a condition, added a medicine, chose the **afternoon** time slot, and continued.
+- **Setup step 3 (family and safety):** he filled in the caretaker's name and phone number, and the optional doctor's number. He called this part "really good" and said the doctor's number is very important.
+- He noticed the language choice (English, Hindi, Marathi and Konkani for speaking).
+- **After setup:** he looked over Today and the quick-add buttons, and saw the plate-scan screen that shows dishes and calories. He said it looked good at first glance and was clearly impressed.
+
+*What confused him:* nothing stopped him during setup. The session was short, though. I did not see him log a full day by voice or scan his own meal, so the main daily loop (speak a log, see entries appear) is still untested with a real user.
+
+*What I changed:* nothing yet from this session, because no problem came up. My own checks on phone and laptop sizes led to these fixes:
+
 - The setup flow skipped steps 2 and 3. Fixed.
 - "medicines" wrapped badly in the progress card on phones. Shortened to "meds".
 - Sign-in was removed on faculty advice, so the app now opens straight into setup.
 
-The live AI tests in Q3 also led to fixes: model fallback when Google was busy, no false reminders, no invented names. These are self-tests, not a user test, and I am reporting them as that.
+The live AI tests in Q3 also led to fixes: model fallback when Google was busy, no false reminders, no invented names.
 
-**Planned user test.** A family member over 60 opens the link on their own phone, sets up with help, then logs breakfast by voice and adds a BP reading. I will note where they hesitate and what they ask.
+*Limits of this test:* one person, slightly younger than my target customer (62–75), seen for a few minutes, mostly on setup. **Next test:** ask him (or someone over 62) to use it for a day: log breakfast by voice, add a BP reading, scan one meal, then send the family update. I will note where they hesitate and what they ask.
 
 ---
 
