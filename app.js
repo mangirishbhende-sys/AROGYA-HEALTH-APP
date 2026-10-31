@@ -602,7 +602,7 @@ function vSetup(){
   const f = (id, label, val, type = 'text', extra = '') => `<label class="f" for="${id}">${label}</label><input id="${id}" type="${type}" value="${esc(val)}" ${extra}>`;
   const meds = (p.meds && p.meds.length) ? p.meds : [{ id: uid(), name:'', time:'Morning' }];
   const steps = {
-    1: `<h1>About you</h1><p class="muted" style="margin-top:6px">This helps Saathi give advice that fits you. A family member can help.</p>
+    1: `<h1>About you</h1><p class="muted" style="margin-top:6px">This helps Saathi give advice that fits you. A family member can help. Everything stays on this phone, and no account is needed.</p>
       <button style="margin-top:16px" class="full" data-act="micProfile">${ic('mic')} Fill this in by speaking</button>
       ${f('pName','Full name', p.name || cloud.user?.fullName || '', 'text', 'autocomplete="name"')}
       <div class="two"><div>${f('pAge','Age',p.age,'number','inputmode="numeric"')}</div><div><label class="f" for="pSex">Sex</label><select id="pSex"><option value="">Select</option>${['female','male','other'].map(o => `<option value="${o}" ${p.sex===o?'selected':''}>${o[0].toUpperCase()+o.slice(1)}</option>`).join('')}</select></div></div>
@@ -626,7 +626,7 @@ function vSetup(){
     <div class="card">${steps[st]}</div>
   </div>
   <div class="setupbar"><div class="in">
-    ${st > 1 ? '<button data-act="setupBack">Back</button>' : (cloud.user ? '' : '<button data-act="toLogin">Back</button>')}
+    ${st > 1 ? '<button data-act="setupBack">Back</button>' : ''}
     <button class="primary" data-act="setupNext">${st < 3 ? 'Continue' : 'Finish'}</button>
   </div></div>`;
 }

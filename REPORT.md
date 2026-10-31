@@ -107,7 +107,7 @@ The hardware delivery complaints are real, but they are about HealthifyMe's logi
 **How this choice follows from Q1.** Each of my three reasons hits this customer hardest, and AI can remove each one:
 - **Logging effort (reason 1):** removed by speaking in their own language and photographing the plate.
 - **Advice that doesn't fit (reason 2):** the advice uses their own conditions, their own Goan food and their last 7 days of habits and readings.
-- **Trust (reason 3):** the app is free, shows no ads, makes no sales calls, works without an account, and shares nothing unless they press "Send".
+- **Trust (reason 3):** the app is free, shows no ads, makes no sales calls, needs no account, keeps the data on their own phone, and shares nothing unless they press "Send".
 
 ---
 
@@ -186,12 +186,12 @@ A form or button could not take that sentence. Without AI, the person would fill
 | N01 | BP, sugar and weight readings with ranges and red-flag alerts | **Build now** | This customer's main daily numbers. Readings can be spoken or typed. |
 | N02 | Medicine schedule and 7-day adherence | **Build now** | What families worry about most. Ticked by voice ("took my BP tablet") or by tap. |
 | N03 | Voice in four languages, replies read aloud, extra-large text | **Build now** | Removes the typing and small-text barriers (Pan et al.). |
-| N04 | Optional account and online backup | **Build now, optional** | Sign in with Google or email (Clerk) to keep a safe copy (Supabase, row-level security). The app works fully without it. |
+| N04 | Account and online backup | **Later** | Built and tested (Clerk sign-in with Supabase storage), then removed on faculty advice. The brief asks for no sign-up, and older users quit at registration (Pan et al.). Data stays on the phone, with a backup-to-file option. |
 
 **The core experience**
 
 *First two minutes:*
-1. Open the link. The **Sign in** page appears, with **Try it without an account** below it ([screenshot 01](docs/screenshots/01-sign-in.png)).
+1. Open the link. There is no account or password: the app opens straight into setup.
 2. A **3-step setup** (about you, health and medicines, family): one screen per step, large buttons, and a **"Fill this in by speaking"** option ([02](docs/screenshots/02-setup.png)).
 3. **Today** opens. The progress ring is at 0%, Saathi's suggestion is at the top, and the big microphone says *"How is your day going?"*
 
@@ -212,10 +212,10 @@ A form or button could not take that sentence. Without AI, the person would fill
    - *Weighed:* these are what competitors sell. But the reviews show that paid plans and pushy sales are what make people leave.
    - *Chose:* a free app with one tip at a time.
    - *Would change my mind:* evidence that this customer would pay for a human dietitian, and a way to offer that without sales pressure.
-3. **Sign-in first, but never required.**
-   - *Weighed:* an account protects the log if the phone is lost and lets family help. But the brief requires no sign-up, Pan et al. saw older users quit at registration, and health data is sensitive (D07).
-   - *Chose:* a sign-in page first with a clear "Try it without an account". Data stays on the phone unless they sign in.
-   - *Would change my mind:* if most testers chose to sign in, I would make the account the default and simplify the guest path.
+3. **No account at all.**
+   - *Weighed:* an account protects the log if the phone is lost and lets family help, and I had built optional sign-in (Clerk) with online backup (Supabase). But the brief requires no sign-up, Pan et al. saw older users quit at registration, health data is sensitive (D07), and my faculty advised removing it.
+   - *Chose:* no account. Data stays on the phone, with "Back up to a file" in Settings and a WhatsApp summary for family.
+   - *Would change my mind:* if users lost their logs by changing phones, I would bring back an optional account with family access.
 
 ---
 
@@ -224,18 +224,17 @@ A form or button could not take that sentence. Without AI, the person would fill
 **What I built.** The app is a static web app with no build step:
 - **Hosting:** Vercel. It opens from the link with nothing to install, and can be added to the home screen as an app.
 - **AI:** Google Gemini, called through a small Vercel function (`api/ai.js`). The key lives only in Vercel's settings, never in the repository.
-- **Optional sign-in:** Clerk.
-- **Optional online storage:** Supabase, with row-level security so each person can read only their own rows.
+- **No account:** all data stays on the person's phone (browser storage), with backup to a file.
 - **Without AI:** if the AI is unavailable, the app still logs entries using simple built-in rules. Readings are always checked by code.
 
-The commit history shows how it grew: a single-page prototype, then the design, Clerk and Supabase, and this version.
+The commit history shows how it grew: a single-page prototype, then the design, then optional sign-in with Clerk and Supabase, then this version, which removed sign-in on faculty advice.
 
 **Who tested it, what they did, what confused them, and what I changed** ✏️
 
 | | |
 |---|---|
 | **Who** | ✏️ e.g. "My grandmother, 70, Ponda; uses WhatsApp daily, has BP" |
-| **What I asked them to do** | Open the link, try it without an account, set up, then tell Saathi about breakfast by voice and add a BP reading |
+| **What I asked them to do** | Open the link, set up, then tell Saathi about breakfast by voice and add a BP reading |
 | **What they did** | ✏️ |
 | **What confused them** | ✏️ |
 | **What I changed** | ✏️ |
@@ -252,7 +251,7 @@ The commit history shows how it grew: a single-page prototype, then the design, 
   - **D09** (avatar videos): cut.
   - **D04** (cost): free tiers are enough at this scale.
   - **D06 and D11** (accuracy, regional food): remain, and are handled by the confirm-and-edit step and confidence labels.
-  - **D07** (privacy) and **D08** (connectivity): remain. They are handled by local-first storage, optional sign-in, and the offline fallback.
+  - **D07** (privacy) and **D08** (connectivity): remain. They are handled by keeping data on the phone, backup to a file, and the offline fallback.
 - **Which of H1–H4 survive?** H2 survives as *hidden costs and pressure*. H1 survives as *logging effort*. H3 does not survive. H4 has no review evidence but stays as a design rule.
 - **Where does AI do the work itself?** It turns speech and photos into records. It writes the daily suggestion and the family note without being asked. It fills the profile from a sentence.
 
@@ -292,5 +291,5 @@ The commit history shows how it grew: a single-page prototype, then the design, 
 
 | Tool used | What it was used for | How I checked its output |
 |---|---|---|
-| Claude (Anthropic), in the Claude app | Writing and debugging the app code; setting up Vercel, Clerk and Supabase; finding and summarising published sources and reviews; drafting this report from my decisions | Ran the app on phone and laptop sizes after every change and fixed the bugs found. Checked each statistic against the original paper. Read the review pages myself. Edited the report to match my own choices. ✏️ *(adjust to what you actually did)* |
+| Claude (Anthropic), in the Claude app | Writing and debugging the app code; setting up Vercel (and an optional Clerk/Supabase sign-in that was later removed); finding and summarising published sources and reviews; drafting this report from my decisions | Ran the app on phone and laptop sizes after every change and fixed the bugs found. Checked each statistic against the original paper. Read the review pages myself. Edited the report to match my own choices. ✏️ *(adjust to what you actually did)* |
 | Google Gemini (inside the app) | Understanding voice and text logs, reading meal photos, daily suggestions, coach answers, the weekly family note | The 10 tests in Q3, including failures. Safety rules are enforced by code, not left to the AI. |
