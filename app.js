@@ -658,7 +658,7 @@ function vToday(){
   B.hero = `<section class="hero" aria-label="Progress">
     <div class="scoreRing">${ring(pct, 'var(--mango)', 'rgba(255,255,255,.1)')}<div class="c"><b>${pct}%</b><span>of goals</span></div></div>
     <div class="grow"><h2>${isToday ? "Today's progress" : fmtDate(selDay, { weekday:'long', day:'numeric', month:'short' })}</h2><p class="msg">${heroMsg}</p>
-      <div class="mini"><div><b>${t.water}/${p.waterTarget}</b>glasses</div><div><b>${t.walk}/${p.walkTarget}</b>min active</div><div><b>${t.medsTotal ? t.medsTaken + '/' + t.medsTotal : t.meals + '/' + MEAL_TARGET}</b>${t.medsTotal ? 'medicines' : 'meals'}</div></div></div>
+      <div class="mini"><div><b>${t.water}/${p.waterTarget}</b>glasses</div><div><b>${t.walk}/${p.walkTarget}</b>min active</div><div><b>${t.medsTotal ? t.medsTaken + '/' + t.medsTotal : t.meals + '/' + MEAL_TARGET}</b>${t.medsTotal ? 'meds' : 'meals'}</div></div></div>
   </section>${isToday ? '' : `<button class="link" style="margin-top:8px" data-day="${dkey()}">${ic('back')} Back to today</button>`}`;
   B.alert = r?.alert ? `<section class="card alert" role="alert"><div class="card-h"><span class="chip">${ic('alert')}</span><h2 class="grow">Please act now</h2></div><p>${esc(r.alert)}</p>
      <div class="row wrap" style="margin-top:14px">${p.caretakerPhone ? `<a class="btn danger grow" href="tel:${esc(p.caretakerPhone)}">${ic('phone')} Call ${esc(p.caretakerName || 'caretaker')}</a>` : ''}<a class="btn danger grow" href="tel:112">${ic('ambulance')} Call 112</a></div></section>` : '';

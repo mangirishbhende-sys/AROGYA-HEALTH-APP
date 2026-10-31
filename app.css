@@ -391,5 +391,5 @@ nav.tabs .fab .lbl,nav.tabs .navlabel{display:none}
 .sidebrand .logoimg{width:40px;height:40px}
 @media (min-width:960px){ .topbar .logoimg{display:none} .topbar{justify-content:flex-end} }
 .hero .mini{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
-.hero .mini div{min-width:0;overflow-wrap:anywhere}
+.hero .mini div{min-width:0}
 @media (max-width:560px){ .hero{gap:14px;padding:18px} .hero .scoreRing{width:104px;height:104px} .hero .scoreRing .c b{font-size:1.6rem} .hero h2{font-size:1.02rem} .hero .msg{font-size:.84rem} }
