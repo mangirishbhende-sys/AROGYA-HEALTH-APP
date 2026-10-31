@@ -1,8 +1,11 @@
 # Report: Dempo Saathi
 
-**Mangirish Sadashiv Bhende · Roll No.PGDMAI-25-04.
+**Mangirish Sadashiv Bhende** · Roll No. PGDMAI-25-04
 
-MAI-594 Introduction to Vibe Coding · PGDM (AI²) · AY 2026–27 · Live app: https://arogya-health-app-five.vercel.app
+MAI-594 Introduction to Vibe Coding · PGDM (AI²) · AY 2026–27
+
+- **Live app:** https://arogya-health-app-five.vercel.app (opens straight away, no account needed)
+- **Code:** https://github.com/mangirishbhende-sys/AROGYA-HEALTH-APP
 
 
 ---
@@ -66,6 +69,7 @@ He is slightly younger than my target customer (62–75) and has no chronic cond
    - Krebs & Duncan: data entry was the top reason for stopping (44.5%).
    - Pan et al.: food diaries were a heavy workload, and barcode scanning did not fit home-cooked food.
    - MyFitnessPal reviewers left after redesigns added steps to logging a meal.
+   - Interview 1: alerts and daily step targets turned his walk into homework, and he uninstalled within weeks.
    - An app that needs a form for every meal loses people within weeks.
 2. **The advice does not fit the person's real life, so it feels useless.**
    - HealthifyMe's paid users most often complained of generic diet charts and coaches who changed or did not listen.
@@ -162,7 +166,7 @@ A form or button could not take that sentence. Without AI, the person would fill
 | 10 | Coach: *"Is poi okay for my sugar?"* | Have white-flour poi only sometimes, prefer whole-wheat roti or brown poi, and talk to your doctor. | **Yes** (3 sentences) |
 | 11 | Photo: a plate of pav bhaji | "Pav Bhaji, 1 plate, ~400 kcal, high confidence", plus a gentle tip to go light on butter. | **Partly.** Correct dish, but calories are probably low for two buttered pav (~500–600). This is why every photo result is editable before saving. |
 
-**Overall:** 6 good, 3 partly, 2 failures found and fixed.
+**Overall (11 inputs):** 5 good (tests 2, 4, 6, 9, 10), 4 partly (1, 3, 5, 11), and 2 failures (7, 8) found and fixed.
 
 **Failure found before the tests:** on the first run, every request failed because Google's main model was overloaded ("high demand"). I changed the server function to fall back to a lighter Gemini model. All the results above came from that fallback (`gemini-flash-lite`). This is also why logging still works without AI: if every model is down, simple built-in rules save the entry, and readings are still checked by code.
 
@@ -209,6 +213,16 @@ A form or button could not take that sentence. Without AI, the person would fill
 - **Evening:** a glance at **Health** for the week's BP trend ([06](docs/screenshots/06-health.png)), then **Family → Send on WhatsApp** to the son ([09](docs/screenshots/09-family.png)).
 - **If something is wrong:** a reading of 186/121 brings up a red card with **Call Rahul** and **Call 112** ([11](docs/screenshots/11-red-flag-alert.png)).
 
+**Key screens** (made-up sample data)
+
+| Setup by speaking | Today | Food photo |
+|---|---|---|
+| <img src="docs/screenshots/02-setup.png" width="220" alt="Setup screen with Fill this in by speaking"> | <img src="docs/screenshots/03-today.png" width="220" alt="Today screen with progress ring and microphone"> | <img src="docs/screenshots/05-food.png" width="220" alt="Food photo result with dishes and calories"> |
+| **Health readings** | **Medicines** | **Family update** |
+| <img src="docs/screenshots/06-health.png" width="220" alt="Health screen with BP trend"> | <img src="docs/screenshots/07-meds.png" width="220" alt="Medicine checklist"> | <img src="docs/screenshots/09-family.png" width="220" alt="Family screen with WhatsApp share"> |
+| **Log something** | **Reports** | **Red-flag alert** |
+| <img src="docs/screenshots/10-log-something.png" width="220" alt="Log something by voice or text"> | <img src="docs/screenshots/08-reports.png" width="220" alt="Weekly report"> | <img src="docs/screenshots/11-red-flag-alert.png" width="220" alt="Red alert card with call buttons"> |
+
 **My three hardest calls**
 
 1. **Adults over 60, not young people.**
@@ -226,7 +240,7 @@ A form or button could not take that sentence. Without AI, the person would fill
 
 ---
 
-## Q5. User test
+## Q5. Build it, and user test
 
 **What I built.** The app is a static web app with no build step:
 - **Hosting:** Vercel. It opens from the link with nothing to install, and can be added to the home screen as an app.
@@ -313,4 +327,4 @@ The live AI tests in Q3 also led to fixes: model fallback when Google was busy, 
 | Tool used | What it was used for | How I checked its output |
 |---|---|---|
 | Claude (Anthropic), in the Claude app | Writing and debugging the app code; setting up Vercel (and an optional Clerk/Supabase sign-in that was later removed); finding and summarising published sources and reviews; drafting this report from my decisions | Ran the app on phone and laptop sizes after every change and fixed the bugs found. Checked each statistic against the original paper. Read the review pages myself. Edited the report to match my own choices. |
-| Google Gemini (inside the app) | Understanding voice and text logs, reading meal photos, daily suggestions, coach answers, the weekly family note | The 10 tests in Q3, including failures. Safety rules are enforced by code, not left to the AI. |
+| Google Gemini (inside the app) | Understanding voice and text logs, reading meal photos, daily suggestions, coach answers, the weekly family note | The 11 tests in Q3, including failures. Safety rules are enforced by code, not left to the AI. |
