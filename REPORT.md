@@ -243,7 +243,7 @@ The commit history shows how it grew: a single-page prototype, then the design, 
 *What he did:*
 
 - **Setup step 1 (about you):** he used **"Fill this in by speaking"** and answered aloud instead of typing: name, age, email, weight and the other basics. He liked that he only had to answer, and said it stops typing from feeling boring.
-- **Setup step 2 (health and medicines):** he typed "BP" as a condition, added a medicine, chose the **afternoon** time slot, and continued.
+- **Setup step 2 (health and medicines):** to try the form he typed "BP" as a sample condition (he does not have BP himself; BP is there because it is the most common condition in my target group), added a medicine, chose the **afternoon** time slot, and continued.
 - **Setup step 3 (family and safety):** he filled in the caretaker's name and phone number, and the optional doctor's number. He called this part "really good" and said the doctor's number is very important.
 - He noticed the language choice (English, Hindi, Marathi and Konkani for speaking).
 - **After setup:** he looked over Today and the quick-add buttons, and saw the plate-scan screen that shows dishes and calories. He said it looked good at first glance and was clearly impressed.
