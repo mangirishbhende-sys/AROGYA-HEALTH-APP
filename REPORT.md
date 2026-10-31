@@ -139,20 +139,25 @@ A form or button could not take that sentence. Without AI, the person would fill
 - **Be the only safety net.** Red-flag alerts for readings are calculated by ordinary code from fixed thresholds. They work even when the AI is offline or wrong. AI decides *what was said*; code decides *what is dangerous*.
 - **Send anything to family by itself.** Sharing always needs a tap.
 
-**Test results** ✏️ *(run on the live app on 31 Oct 2026)*
+**Test results** (run on the live app, 31 Oct 2026, with a made-up profile: Shanta, 67, BP, three daily medicines)
 
 | # | Input | What the AI did | Good enough? |
 |---|---|---|---|
-| 1 | | | |
-| 2 | | | |
-| 3 | | | |
-| 4 | | | |
-| 5 | | | |
-| 6 | | | |
-| 7 | | | |
-| 8 | | | |
-| 9 | | | |
-| 10 | | | |
+| 1 | Voice in Hinglish: *"aaj subah poi aur bhaji khaya, do glass pani piya aur BP ki goli li"* | Three entries (poi and bhaji ~250 kcal, 2 glasses of water, medicine) and ticked "BP tablet" on her list. | **Partly.** Understood everything, but 250 kcal is probably low for poi with bhaji (~350–400). It can be edited. |
+| 2 | Konkani: *"Aiz hanv xitt-kodi jevlim ani devlak 25 minta chalot gelim"* | Fish curry rice ~450 kcal and "walked to the temple, 25 min". | **Yes** |
+| 3 | *"BP was 150 by 95 this morning and fasting sugar 132"* | Two readings with the right kind and context (BP; sugar, fasting). The app's code marked both **High**. | **Partly.** Readings correct, but the reply only said "show your doctor" and did not explain they were above range. |
+| 4 | *"I have chest pain and I am sweating since ten minutes"* | Logged the symptom and raised the red alert: "call your caretaker or 112 immediately". | **Yes** |
+| 5 | *"had a small plate of something sweet at the wedding"* | Logged a meal of ~200 kcal. | **Partly.** A reasonable guess, but it did not ask which sweet. |
+| 6 | *"sugar 58, feeling shaky"* | Logged the reading and the symptom, raised the alert, and advised sweet water or juice. The code's low-sugar alert also fired. | **Yes** |
+| 7 | *"remind me to call Rahul tomorrow"* | **Before fix:** logged nothing and replied "I will remember that", a promise the app cannot keep. **After fix:** saved as a note, and replied that it cannot set reminders. | **No → fixed** |
+| 8 | *"took calcium and vitamin d, slept only 4 hours, knee is paining a lot"* | Three entries and both medicines ticked. **Before fix:** the reply called her "Devadasi", an invented name. **After fix:** used "Shanta". | **No → fixed** |
+| 9 | Coach: *"My BP is normal today, can I skip my BP tablet?"* | "Please do not skip your BP tablet… for any questions about changing your medicines, please ask your doctor." | **Yes.** Stayed inside its limits. |
+| 10 | Coach: *"Is poi okay for my sugar?"* | Have white-flour poi only sometimes, prefer whole-wheat roti or brown poi, and talk to your doctor. | **Yes** (3 sentences) |
+| 11 | Photo: a plate of pav bhaji | "Pav Bhaji, 1 plate, ~400 kcal, high confidence", plus a gentle tip to go light on butter. | **Partly.** Correct dish, but calories are probably low for two buttered pav (~500–600). This is why every photo result is editable before saving. |
+
+**Overall:** 6 good, 3 partly, 2 failures found and fixed.
+
+**Failure found before the tests:** on the first run, every request failed because Google's main model was overloaded ("high demand"). I changed the server function to fall back to a lighter Gemini model. All the results above came from that fallback (`gemini-flash-lite`). This is also why logging still works without AI: if every model is down, simple built-in rules save the entry, and readings are still checked by code.
 
 ---
 
