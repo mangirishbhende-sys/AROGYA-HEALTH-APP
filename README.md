@@ -1,6 +1,6 @@
 # Dempo Saathi
 
-**Mangirish Sadashiv Bhende** · Roll No. **✏️[roll number]** · MAI-594 Introduction to Vibe Coding · AY 2026–27
+**Mangirish Sadashiv Bhende** · Roll No. PGDMAI-25-04 · MAI-594 Introduction to Vibe Coding · AY 2026–27
 
 > **A voice-first AI health companion for adults over 60 in Goa. They tell it about their day in their own language, and it keeps track of meals, water, walks, medicines and BP or sugar readings, warns them when something needs a doctor, and keeps their family in the loop.**
 
