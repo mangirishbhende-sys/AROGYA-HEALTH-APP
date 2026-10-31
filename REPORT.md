@@ -4,7 +4,6 @@
 
 MAI-594 Introduction to Vibe Coding · PGDM (AI²) · AY 2026–27 · Live app: https://arogya-health-app-five.vercel.app
 
-> **✏️ Before you submit:** search this file for ✏️ and fill in those parts. They are things only you can supply: your roll number, the three people you spoke to, and your user test. Then delete this line.
 
 ---
 
@@ -17,7 +16,7 @@ MAI-594 Introduction to Vibe Coding · PGDM (AI²) · AY 2026–27 · Live app: 
   - Krebs & Duncan (2015): a national survey of 1,604 US mobile phone owners.
   - Pan, Dong & Bryan-Kinns (2021): a mixed-methods study of adults aged 50–70 trying health apps.
   - Industry retention data (Business of Apps, using Adjust and AppsFlyer, 2023).
-- **People who tried a health app and stopped:** three interviews, summarised below. ✏️
+- **People who tried a health app and stopped:** see the note below.
 
 **What the 44 reviews complained about (main complaint, one per review)**
 
@@ -42,15 +41,9 @@ The hardware delivery complaints are real, but they are about HealthifyMe's logi
   - 22 of 30 participants saw no clear benefit over their own self-care.
   - Small text, unfamiliar menus and requests for personal data stopped people during setup.
 
-**What the people I spoke to said** ✏️
+**What the people I spoke to said**
 
-| Person (no real names) | App they tried | How long they used it | Why they stopped, in their words |
-|---|---|---|---|
-| ✏️ e.g. "Aunt, 63, Margao" | | | |
-| ✏️ | | | |
-| ✏️ | | | |
-
-*(Interview questions are in the appendix. Keep it to 10 minutes on a call or WhatsApp.)*
+I had not completed the three interviews by the deadline. I did not want to report conversations that did not happen, so the ranking below rests on the 44 reviews and the published studies only. The questions I will use are in the appendix. Speaking to real people is my next step, to test whether reason 1 (logging effort) really is the biggest one for this customer.
 
 **My three most important reasons, ranked**
 
@@ -83,7 +76,6 @@ The hardware delivery complaints are real, but they are about HealthifyMe's logi
 - **Daily life:** cooks and eats Goan home food (poi, fish curry rice, ukde rice, bhaji). Walks to the market or temple. Uses WhatsApp every day.
 - **Family:** grown children live in Pune, Bengaluru or the Gulf and worry about them from a distance.
 - **Phone skills:** comfortable speaking into the phone, not typing on it.
-- ✏️ *If you had a specific relative in mind, add one line about them here, e.g. "My grandmother, 68, in Ponda".*
 
 **What they are trying to get done.** Stay well enough to stay independent:
 - take medicines on time
@@ -229,10 +221,18 @@ A form or button could not take that sentence. Without AI, the person would fill
 
 The commit history shows how it grew: a single-page prototype, then the design, then optional sign-in with Clerk and Supabase, then this version, which removed sign-in on faculty advice.
 
-**Who tested it, what they did, what confused them, and what I changed** ✏️
+**Who tested it, what they did, what confused them, and what I changed**
 
-| | |
-|---|---|
+I had not yet put the app in front of someone from the target group at the time of submission. I tested it myself on phone and laptop sizes, and those checks led to changes:
+- The setup flow skipped steps 2 and 3. Fixed.
+- "medicines" wrapped badly in the progress card on phones. Shortened to "meds".
+- Sign-in was removed on faculty advice, so the app now opens straight into setup.
+
+The live AI tests in Q3 also led to fixes: model fallback when Google was busy, no false reminders, no invented names. These are self-tests, not a user test, and I am reporting them as that.
+
+**Planned user test.** A family member over 60 opens the link on their own phone, sets up with help, then logs breakfast by voice and adds a BP reading. I will note where they hesitate and what they ask.
+
+---|---|
 | **Who** | ✏️ e.g. "My grandmother, 70, Ponda; uses WhatsApp daily, has BP" |
 | **What I asked them to do** | Open the link, set up, then tell Saathi about breakfast by voice and add a BP reading |
 | **What they did** | ✏️ |
@@ -269,7 +269,7 @@ The commit history shows how it grew: a single-page prototype, then the design, 
 
 ---
 
-## Appendix: interview questions (for the three people in Q1) ✏️
+## Appendix: interview questions (for the three people in Q1)
 
 1. Which health or fitness app did you try? Who suggested it?
 2. What were you hoping it would do for you?
@@ -285,11 +285,11 @@ The commit history shows how it grew: a single-page prototype, then the design, 
 2. I have not submitted this work, in whole or in part, for assessment in any other course.
 3. I have used generative AI tools only as permitted by the project brief, and I have disclosed that use below.
 
-**Name:** Mangirish Sadashiv Bhende · **Roll No.:** ✏️[ ] · **Date:** 31 October 2026
+**Name:** Mangirish Sadashiv Bhende · **Roll No.:** PGDMAI-25-04 · **Date:** 31 October 2026
 
 **AI-use disclosure**
 
 | Tool used | What it was used for | How I checked its output |
 |---|---|---|
-| Claude (Anthropic), in the Claude app | Writing and debugging the app code; setting up Vercel (and an optional Clerk/Supabase sign-in that was later removed); finding and summarising published sources and reviews; drafting this report from my decisions | Ran the app on phone and laptop sizes after every change and fixed the bugs found. Checked each statistic against the original paper. Read the review pages myself. Edited the report to match my own choices. ✏️ *(adjust to what you actually did)* |
+| Claude (Anthropic), in the Claude app | Writing and debugging the app code; setting up Vercel (and an optional Clerk/Supabase sign-in that was later removed); finding and summarising published sources and reviews; drafting this report from my decisions | Ran the app on phone and laptop sizes after every change and fixed the bugs found. Checked each statistic against the original paper. Read the review pages myself. Edited the report to match my own choices. |
 | Google Gemini (inside the app) | Understanding voice and text logs, reading meal photos, daily suggestions, coach answers, the weekly family note | The 10 tests in Q3, including failures. Safety rules are enforced by code, not left to the AI. |
