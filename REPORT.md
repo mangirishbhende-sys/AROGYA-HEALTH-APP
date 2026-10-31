@@ -232,13 +232,6 @@ The live AI tests in Q3 also led to fixes: model fallback when Google was busy, 
 
 **Planned user test.** A family member over 60 opens the link on their own phone, sets up with help, then logs breakfast by voice and adds a BP reading. I will note where they hesitate and what they ask.
 
----|---|
-| **Who** | ✏️ e.g. "My grandmother, 70, Ponda; uses WhatsApp daily, has BP" |
-| **What I asked them to do** | Open the link, set up, then tell Saathi about breakfast by voice and add a BP reading |
-| **What they did** | ✏️ |
-| **What confused them** | ✏️ |
-| **What I changed** | ✏️ |
-
 ---
 
 ## Answers to the "questions to carry into your project" (class notes, section 7)
