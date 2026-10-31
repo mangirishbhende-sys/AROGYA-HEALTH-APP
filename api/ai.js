@@ -1,7 +1,7 @@
 // Vercel serverless function: forwards Dempo Saathi's AI requests to Google Gemini.
 // The Gemini key lives only in Vercel → Project → Settings → Environment Variables (GEMINI_API_KEY),
 // never in this repository.
-const MODELS = ['gemini-flash-latest', 'gemini-2.5-flash', 'gemini-2.5-flash-lite', 'gemini-flash-lite-latest'];
+const MODELS = ['gemini-2.5-flash', 'gemini-flash-latest', 'gemini-2.5-flash-lite', 'gemini-flash-lite-latest'];
 
 module.exports = async (req, res) => {
   const key = process.env.GEMINI_API_KEY;
@@ -23,6 +23,8 @@ module.exports = async (req, res) => {
       });
       if (r.status === 404) { last = 'Model not found: ' + model; continue; }
       const data = await r.json();
+      // Busy or rate-limited: try the next (lighter) model instead of failing.
+      if ([429, 500, 503].includes(r.status)) { last = data?.error?.message || ('HTTP ' + r.status); continue; }
       if (!r.ok) return res.status(r.status).json({ error: data?.error?.message || 'AI error' });
       const text = (data.candidates?.[0]?.content?.parts || []).map(p => p.text || '').join('').trim();
       return res.status(200).json({ text, model });

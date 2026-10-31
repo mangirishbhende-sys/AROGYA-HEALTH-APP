@@ -250,11 +250,12 @@ async function gemini(parts, { system = SAFETY, json = false, temperature = 0.4 
         const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, { method:'POST', headers:{ 'Content-Type':'application/json', 'x-goog-api-key': key }, body: JSON.stringify(body) });
         if (res.status === 404){ lastErr = new Error('Model not found: ' + model); continue; }
         const data = await res.json();
+        if ([429, 500, 503].includes(res.status)){ lastErr = new Error(data?.error?.message || 'busy'); continue; }
         if (!res.ok) throw new Error(data?.error?.message || ('HTTP ' + res.status));
         text = (data.candidates?.[0]?.content?.parts || []).map(p => p.text || '').join('').trim();
         if (!S.settings.model){ S.settings.model = model; persist(); }
         lastErr = null; break;
-      } catch(e){ lastErr = e; if (!/not found/i.test(e.message)) break; }
+      } catch(e){ lastErr = e; if (!/not found|busy|demand|overloaded|quota/i.test(e.message)) break; }
     }
     if (lastErr) throw lastErr;
   }
