@@ -16,7 +16,7 @@ MAI-594 Introduction to Vibe Coding · PGDM (AI²) · AY 2026–27 · Live app: 
   - Krebs & Duncan (2015): a national survey of 1,604 US mobile phone owners.
   - Pan, Dong & Bryan-Kinns (2021): a mixed-methods study of adults aged 50–70 trying health apps.
   - Industry retention data (Business of Apps, using Adjust and AppsFlyer, 2023).
-- **People who tried a health app and stopped:** see the note below.
+- **People who tried a health app and stopped:** one interview so far (below); two still to do.
 
 **What the 44 reviews complained about (main complaint, one per review)**
 
@@ -43,7 +43,22 @@ The hardware delivery complaints are real, but they are about HealthifyMe's logi
 
 **What the people I spoke to said**
 
-I had not completed the three interviews by the deadline. I did not want to report conversations that did not happen, so the ranking below rests on the 44 reviews and the published studies only. The questions I will use are in the appendix. Speaking to real people is my next step, to test whether reason 1 (logging effort) really is the biggest one for this customer.
+I have completed one of the three interviews so far.
+
+**Interview 1: Mr. Prakash K., about 58–60, a friend's father in Goa (WhatsApp chat, 31 Oct 2026).** No BP or sugar condition. His children got him to install a step-tracking and fitness app (he did not remember the exact name; possibly Google Fit), and he also tried a couple of others. He stopped within a few weeks. His reasons:
+
+- **Constant nagging.** The phone kept buzzing to say he had not moved enough, even while he was relaxing with tea or reading.
+- **Battery drain.** Background location and movement tracking emptied his battery by afternoon, when he needed the phone for calls.
+- **Tiny text and cluttered screens.** Small fonts and screens full of charts and numbers felt overwhelming, not helpful.
+- **It took the joy out of walking.** His morning walk turned into a daily target and score, and started to feel like homework.
+
+**What this adds:** his account supports reason 1. The app demanded effort and attention every day, in his case through alerts and targets rather than typing. It matches Pan et al.'s finding on small text and cluttered menus. It also adds a point the reviews did not show: pressure from notifications and scores makes the app feel like a chore. This backs three design choices in Dempo Saathi:
+
+- one gentle suggestion a day instead of repeated alerts
+- no background step or location tracking (F03), so no battery drain
+- extra-large text and simple screens (N03)
+
+He is slightly younger than my target customer (62–75) and has no chronic condition, so I treat this as supporting evidence, not proof. The other two interviews are still to be done, using the questions in the appendix.
 
 **My three most important reasons, ranked**
 
